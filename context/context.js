@@ -17,7 +17,7 @@ const shippingInfo = Cookies.get("shippingInfo")
   : {};
 const payment = Cookies.get("payment")
   ? JSON.parse(Cookies.get("payment"))
-  : {};
+  : "";
 
 export const ContextProvider = ({ children }) => {
   const [cart, setCart] = useState(cartFromCookies);

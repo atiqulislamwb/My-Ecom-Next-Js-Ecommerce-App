@@ -66,7 +66,7 @@ const Login = () => {
         </button>
         <div className="flex">
           <p className="text-sm ">Don't You have account ?</p>
-          <Link href="/register">
+          <Link href={`/register?redirect=${redirect || "/"}`}>
             <a className="-mt-1 text-lg underline ml-2 hover:text-blue-700 font-bold   text-blue-500  ">
               Register
             </a>

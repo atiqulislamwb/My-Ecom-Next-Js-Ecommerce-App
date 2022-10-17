@@ -15,7 +15,7 @@ const Payment = () => {
       toast.error("Payment method not selected");
     }
 
-    Cookies.set("payment", JSON.stringify({ selectedPaymentMethod }));
+    Cookies.set("payment", JSON.stringify(selectedPaymentMethod));
     router.push("/placeorder");
   };
 
