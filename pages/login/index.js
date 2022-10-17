@@ -1,11 +1,44 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Layout from "../../components/Layout";
 import Link from "next/link";
 import { StateContext } from "../../context/context";
-
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import getError from "./../../utils/error";
+import { toast } from "react-toastify";
+import { signIn } from "next-auth/react";
 const Login = () => {
-  const { email, setEmail, password, setPassword, handleLogin } =
-    useContext(StateContext);
+  const { data: session, status } = useSession();
+  const { email, setEmail, password, setPassword } = useContext(StateContext);
+
+  const handleLogin = async () => {
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+      }
+    } catch (error) {
+      toast.error(getError(error));
+    }
+  };
+
+  const router = useRouter();
+  const { redirect } = router.query;
+  useEffect(() => {
+    if (session?.user) {
+      router.push(redirect || "/");
+    }
+  }, [session, router, redirect]);
+
+  if (status === "loading") {
+    return "Loading .....";
+  }
+
   return (
     <Layout title="Login">
       <div className="flex mt-32 flex-col items-center gap-6 justify-center">
@@ -25,7 +58,10 @@ const Login = () => {
           placeholder="Password"
           className="input input-bordered input-warning w-full max-w-xs"
         />
-        <button className="btn btn-warning" onClick={handleLogin}>
+        <button
+          className="btn btn-warning"
+          onClick={() => handleLogin(email, password)}
+        >
           Log In
         </button>
         <div className="flex">
@@ -41,4 +77,5 @@ const Login = () => {
   );
 };
 
+// export default dynamic(() => Promise.resolve(Login), { ssr: false });
 export default Login;

@@ -3,7 +3,6 @@ import ProductItem from "../components/ProductItem.jsx";
 import axios from "axios";
 
 export default function Home({ products }) {
-  console.log(products);
   return (
     <div>
       <Layout title="Home page">

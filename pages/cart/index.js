@@ -8,8 +8,8 @@ import { BsFillXCircleFill } from "react-icons/bs";
 import dynamic from "next/dynamic";
 const Cart = () => {
   const { cart, handleRemove, updateQuantity } = useContext(StateContext);
-  const cartItems = typeof window !== "undefined" ? cart : undefined;
-  const total = cartItems?.reduce((a, c) => a + c.quantity * c.price, 0);
+
+  const total = cart.reduce((a, c) => a + c.quantity * c.price, 0);
   const router = useRouter();
 
   return (
@@ -34,7 +34,7 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                {cartItems?.map((item) => (
+                {cart?.map((item) => (
                   <tr key={item.id} className="border-b">
                     <td>
                       <Link href={`/products/${item.id}`}>
@@ -80,7 +80,7 @@ const Cart = () => {
             <ul>
               <li>
                 <div className="pb-3 text-xl flex flex-col items-center justify-center h-[100px] shadow-lg  ">
-                  Subtotal ({cartItems?.reduce((a, c) => a + c.quantity, 0)}
+                  Subtotal ({cart?.reduce((a, c) => a + c.quantity, 0)}
                   ): ${total.toFixed(2)}
                 </div>
               </li>
