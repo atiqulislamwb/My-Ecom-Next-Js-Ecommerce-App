@@ -8,7 +8,9 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import Link from "next/link";
 import stripe from "../../utils/stripe.png";
-import { checkout } from "../checkout";
+import { loadStripe } from "@stripe/stripe-js";
+
+import { Checkout } from "../../components/Checkout";
 const OrderDetail = () => {
   const [order, setOrder] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,13 +34,6 @@ const OrderDetail = () => {
     fetchOrder();
   }, [id]);
 
-  if (loading)
-    return (
-      <div className="">
-        <SpinnerRoundOutlined />
-      </div>
-    );
-
   const {
     fullShippingInfo,
     cart,
@@ -53,6 +48,36 @@ const OrderDetail = () => {
   } = order;
 
   const totalItemQuantity = order?.cart?.reduce((a, c) => a + c.quantity, 0);
+
+  const handleCheckout = async () => {
+    let stripePromise = null;
+    const getStripe = () => {
+      if (!stripePromise) {
+        stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
+      }
+      return stripePromise;
+    };
+    const stripe = await getStripe();
+    await stripe.redirectToCheckout({
+      mode: "payment",
+      lineItems: [
+        {
+          price: JSON.stringify(totalPrice),
+          quantity: totalItemQuantity,
+        },
+      ],
+      mode: "subscription",
+      successUrl: `${window.location.origin}?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: window.location.origin,
+    });
+  };
+
+  if (loading)
+    return (
+      <div className="">
+        <SpinnerRoundOutlined />
+      </div>
+    );
 
   return (
     <Layout title={`Order Details-${id}`}>
@@ -132,7 +157,7 @@ const OrderDetail = () => {
           </div>
         </div>
         <div>
-          <div className="w-full mt-5 shadow-lg border border-slate-300  p-5">
+          <div className="w-full mt-5 overflow-y-auto shadow-lg border border-slate-300  p-5">
             <h2 className="mb-2 text-lg">Order Summary</h2>
             <ul>
               <li>
@@ -144,7 +169,7 @@ const OrderDetail = () => {
               <li>
                 <div className="mb-2 flex justify-between">
                   <div>Tax</div>
-                  <div>${taxPrice}</div>
+                  <div>${taxPrice?.toFixed(2)}</div>
                 </div>
               </li>
               <li>
@@ -160,24 +185,12 @@ const OrderDetail = () => {
                 </div>
               </li>
               <li>
-                <button
-                  onClick={() => {
-                    checkout({
-                      lineItems: [
-                        {
-                          price: "price_1LtvbeSJ2JnqsaRVSODellae",
-                          quantity: 2,
-                        },
-                      ],
-                    });
-                  }}
-                >
-                  <a>
-                    {" "}
+                <button onClick={handleCheckout}>
+                  <a className="w-10 h-10 object-fit">
                     <Image
                       src={stripe}
                       alt="stripe-button"
-                      className="w-20 object-contain shadow-lg  rounded-lg"
+                      className="w-20  h-10 object-contain shadow-lg  rounded-lg"
                     />
                   </a>
                 </button>

@@ -1,7 +1,7 @@
 import React from "react";
 import { loadStripe } from "@stripe/stripe-js";
 
-export const checkout = async ({ lineItems }) => {
+export const Checkout = async ({ lineItems }) => {
   let stripePromise = null;
   const getStripe = () => {
     if (!stripePromise) {
